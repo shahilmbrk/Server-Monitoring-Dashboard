@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SysWatch — Server Monitor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <span class="logo-icon"><i class="fa-solid fa-wave-square"></i></span>
+            <div class="logo-text">
+                <span class="logo-name">SysWatch</span>
+                <span class="logo-sub">Server Monitor</span>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <span class="status-dot"></span>
+            <span class="status-label">All Systems Operational</span>
+        </div>
+
+        <div class="header-right">
+            <div class="header-time-block">
+                <span class="header-time" id="live-time">--:--:--</span>
+                <span class="header-date" id="live-date">--- --, ----</span>
+            </div>
+            <button class="refresh-btn" onclick="window.location.reload()" title="Refresh">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ══════════════════════════════ MAIN GRID ══════════════════════════════ -->
+    <main class="dashboard-main">
+
+        <!-- ── ROW 1: Key Metrics ── -->
+        <section class="grid grid-4">
+
+            <!-- CPU Usage -->
+            <div class="card card--metric" data-metric="cpu">
+                <div class="card-header">
+                    <span class="card-icon card-icon--cpu"><i class="fa-solid fa-microchip"></i></span>
+                    <div>
+                        <p class="card-label">CPU Usage</p>
+                        <p class="card-sublabel">Utilization</p>
+                    </div>
+                    <span class="card-badge" id="cpu-badge">—</span>
+                </div>
+                <div class="metric-value" id="cpu-value">{{ cpu }}<span class="metric-unit">%</span></div>
+                <div class="progress-track">
+                    <div class="progress-fill progress-fill--cpu" id="cpu-bar" style="width: {{ cpu }}%"></div>
+                </div>
+                <div class="metric-foot">
+                    <span><i class="fa-solid fa-circle-info"></i> {{ cpu_count }} logical cores</span>
+                    <span id="cpu-status"></span>
+                </div>
+            </div>
+
+            <!-- RAM Usage -->
+            <div class="card card--metric" data-metric="ram">
+                <div class="card-header">
+                    <span class="card-icon card-icon--ram"><i class="fa-solid fa-memory"></i></span>
+                    <div>
+                        <p class="card-label">RAM Usage</p>
+                        <p class="card-sublabel">Memory</p>
+                    </div>
+                    <span class="card-badge" id="ram-badge">—</span>
+                </div>
+                <div class="metric-value" id="ram-value">{{ memory }}<span class="metric-unit">%</span></div>
+                <div class="progress-track">
+                    <div class="progress-fill progress-fill--ram" id="ram-bar" style="width: {{ memory }}%"></div>
+                </div>
+                <div class="metric-foot">
+                    <span><i class="fa-solid fa-circle-info"></i> Physical memory</span>
+                    <span id="ram-status"></span>
+                </div>
+            </div>
+
+            <!-- Disk Usage -->
+            <div class="card card--metric" data-metric="disk">
+                <div class="card-header">
+                    <span class="card-icon card-icon--disk"><i class="fa-solid fa-hard-drive"></i></span>
+                    <div>
+                        <p class="card-label">Disk Usage</p>
+                        <p class="card-sublabel">Storage</p>
+                    </div>
+                    <span class="card-badge" id="disk-badge">—</span>
+                </div>
+                <div class="metric-value" id="disk-value">{{ disk }}<span class="metric-unit">%</span></div>
+                <div class="progress-track">
+                    <div class="progress-fill progress-fill--disk" id="disk-bar" style="width: {{ disk }}%"></div>
+                </div>
+                <div class="metric-foot">
+                    <span><i class="fa-solid fa-circle-info"></i> Primary volume</span>
+                    <span id="disk-status"></span>
+                </div>
+            </div>
+
+            <!-- System Uptime -->
+            <div class="card card--metric" data-metric="uptime">
+                <div class="card-header">
+                    <span class="card-icon card-icon--uptime"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                    <div>
+                        <p class="card-label">System Uptime</p>
+                        <p class="card-sublabel">Running since boot</p>
+                    </div>
+                    <span class="card-badge card-badge--up">UP</span>
+                </div>
+                <div class="uptime-display">
+                    <div class="uptime-block">
+                        <span class="uptime-num">{{ days }}</span>
+                        <span class="uptime-label">days</span>
+                    </div>
+                    <div class="uptime-sep">:</div>
+                    <div class="uptime-block">
+                        <span class="uptime-num">{{ hours }}</span>
+                        <span class="uptime-label">hrs</span>
+                    </div>
+                </div>
+                <div class="metric-foot">
+                    <span><i class="fa-solid fa-circle-check"></i> Server is healthy</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ── ROW 2: Network + CPU Info ── -->
+        <section class="grid grid-2">
+
+            <!-- Network Statistics -->
+            <div class="card card--network">
+                <div class="card-title-row">
+                    <span class="card-icon card-icon--net"><i class="fa-solid fa-network-wired"></i></span>
+                    <h2 class="card-title">Network Statistics</h2>
+                    <span class="live-pill"><i class="fa-solid fa-signal"></i> Live</span>
+                </div>
+
+                <div class="network-grid">
+                    <div class="net-stat net-stat--sent">
+                        <div class="net-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="net-info">
+                            <span class="net-label">Bytes Sent</span>
+                            <span class="net-value">{{ sent }}</span>
+                        </div>
+                    </div>
+                    <div class="net-divider"></div>
+                    <div class="net-stat net-stat--recv">
+                        <div class="net-icon"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div class="net-info">
+                            <span class="net-label">Bytes Received</span>
+                            <span class="net-value">{{ recv }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="net-bars">
+                    <div class="net-bar-row">
+                        <span class="net-bar-label"><i class="fa-solid fa-arrow-up"></i> TX</span>
+                        <div class="progress-track progress-track--thin">
+                            <div class="progress-fill progress-fill--sent" id="sent-bar" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="net-bar-row">
+                        <span class="net-bar-label"><i class="fa-solid fa-arrow-down"></i> RX</span>
+                        <div class="progress-track progress-track--thin">
+                            <div class="progress-fill progress-fill--recv" id="recv-bar" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CPU Information -->
+            <div class="card card--cpuinfo">
+                <div class="card-title-row">
+                    <span class="card-icon card-icon--cpu"><i class="fa-solid fa-microchip"></i></span>
+                    <h2 class="card-title">CPU Information</h2>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-key"><i class="fa-solid fa-layer-group"></i> Logical Cores</span>
+                        <span class="info-val">{{ cpu_count }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key"><i class="fa-solid fa-gauge-high"></i> Frequency</span>
+                        <span class="info-val">{{ cpu_freq }} MHz</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key"><i class="fa-solid fa-chart-line"></i> Current Load</span>
+                        <span class="info-val">{{ cpu }}%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key"><i class="fa-solid fa-bolt"></i> Architecture</span>
+                        <span class="info-val">x86_64</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key"><i class="fa-brands fa-linux"></i> Kernel</span>
+                        <span class="info-val">Linux</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ── ROW 3: Process Table ── -->
+        <section class="grid grid-1">
+            <div class="card card--processes">
+                <div class="card-title-row">
+                    <span class="card-icon card-icon--proc"><i class="fa-solid fa-list-check"></i></span>
+                    <h2 class="card-title">Top Running Processes</h2>
+                    <span class="process-count-pill" id="process-count">— processes</span>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="process-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fa-solid fa-hashtag"></i> PID</th>
+                                <th><i class="fa-solid fa-tag"></i> Name</th>
+                                <th><i class="fa-solid fa-microchip"></i> CPU %</th>
+                                <th><i class="fa-solid fa-memory"></i> Memory %</th>
+                                <th><i class="fa-solid fa-user"></i> User</th>
+                                <th><i class="fa-solid fa-circle"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="process-tbody">
+                            {% for proc in processes %}
+                            <tr class="process-row">
+                                <td class="pid-cell">{{ proc.pid }}</td>
+                                <td class="name-cell">{{ proc.name }}</td>
+                                <td class="cpu-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar" style="width: {{ proc.cpu }}%"></div>
+                                        <span>{{ proc.cpu }}%</span>
+                                    </div>
+                                </td>
+                                <td class="mem-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar inline-bar--mem" style="width: {{ proc.memory }}%"></div>
+                                        <span>{{ proc.memory }}%</span>
+                                    </div>
+                                </td>
+                                <td class="user-cell">{{ proc.username }}</td>
+                                <td class="status-cell">
+                                    <span class="proc-status proc-status--{{ proc.status | lower }}">{{ proc.status
+                                        }}</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <!-- Placeholder rows when no data is passed -->
+                            <tr class="process-row placeholder-row">
+                                <td class="pid-cell">1042</td>
+                                <td class="name-cell">nginx</td>
+                                <td class="cpu-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar" style="width:12%"></div><span>1.2%</span>
+                                    </div>
+                                </td>
+                                <td class="mem-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar inline-bar--mem" style="width:8%"></div><span>0.8%</span>
+                                    </div>
+                                </td>
+                                <td class="user-cell">www-data</td>
+                                <td class="status-cell"><span class="proc-status proc-status--running">running</span>
+                                </td>
+                            </tr>
+                            <tr class="process-row placeholder-row">
+                                <td class="pid-cell">2187</td>
+                                <td class="name-cell">python3</td>
+                                <td class="cpu-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar" style="width:28%"></div><span>2.8%</span>
+                                    </div>
+                                </td>
+                                <td class="mem-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar inline-bar--mem" style="width:22%"></div>
+                                        <span>2.2%</span>
+                                    </div>
+                                </td>
+                                <td class="user-cell">ubuntu</td>
+                                <td class="status-cell"><span class="proc-status proc-status--running">running</span>
+                                </td>
+                            </tr>
+                            <tr class="process-row placeholder-row">
+                                <td class="pid-cell">3310</td>
+                                <td class="name-cell">postgres</td>
+                                <td class="cpu-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar" style="width:5%"></div><span>0.5%</span>
+                                    </div>
+                                </td>
+                                <td class="mem-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar inline-bar--mem" style="width:35%"></div>
+                                        <span>3.5%</span>
+                                    </div>
+                                </td>
+                                <td class="user-cell">postgres</td>
+                                <td class="status-cell"><span class="proc-status proc-status--sleeping">sleeping</span>
+                                </td>
+                            </tr>
+                            <tr class="process-row placeholder-row">
+                                <td class="pid-cell">4455</td>
+                                <td class="name-cell">sshd</td>
+                                <td class="cpu-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar" style="width:2%"></div><span>0.2%</span>
+                                    </div>
+                                </td>
+                                <td class="mem-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar inline-bar--mem" style="width:5%"></div><span>0.5%</span>
+                                    </div>
+                                </td>
+                                <td class="user-cell">root</td>
+                                <td class="status-cell"><span class="proc-status proc-status--running">running</span>
+                                </td>
+                            </tr>
+                            <tr class="process-row placeholder-row">
+                                <td class="pid-cell">5891</td>
+                                <td class="name-cell">redis-server</td>
+                                <td class="cpu-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar" style="width:7%"></div><span>0.7%</span>
+                                    </div>
+                                </td>
+                                <td class="mem-cell">
+                                    <div class="inline-bar-wrap">
+                                        <div class="inline-bar inline-bar--mem" style="width:15%"></div>
+                                        <span>1.5%</span>
+                                    </div>
+                                </td>
+                                <td class="user-cell">redis</td>
+                                <td class="status-cell"><span class="proc-status proc-status--running">running</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+    <footer class="dashboard-footer">
+        <span>SysWatch &copy; 2025</span>
+        <span class="footer-sep">·</span>
+        <span>Built with Flask &amp; psutil</span>
+        <span class="footer-sep">·</span>
+        <span id="footer-refresh">Last refresh: <span id="last-refresh-time">—</span></span>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

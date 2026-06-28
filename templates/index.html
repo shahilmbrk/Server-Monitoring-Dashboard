@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Monitoring Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1>🚀 Server Monitoring Dashboard</h1>
+    <div class="dashboard">
+
+        <div class="card">
+            <h2>CPU</h2>
+            <p class="percentage">{{ cpu }}%</p>
+            <div class="progress">
+                <div class="progress-fill" style="width:{{ cpu }}%;background:{{ bar_color }};"> </div>
+            </div>
+            <div class="info">
+                <p>Cores: {{ cpu_count }}</p>
+                <p>Frequency: {{ cpu_freq }} GHz</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>RAM</h2>
+            <p class="percentage">{{ memory }}%</p>
+            <div class="progress">
+                <div class="progress-fill" style="width:{{ memory }}%;background:{{ bar_color }};"> </div>
+            </div>
+            <div class="info">
+                <p>Total: {{ total_ram }} GB</p>
+                <p>Used: {{ used_ram }} GB</p>
+                <p>Available: {{ available_ram }} GB</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Disk</h2>
+            <p class="percentage">{{ disk }}%</p>
+            <div class="progress">
+                <div class="progress-fill" style="width:{{ disk }}%;background:{{ bar_color }};"> </div>
+            </div>
+            <div class="info">
+                <p>Total: {{ total_disk }} GB</p>
+                <p>Used: {{ used_disk }} GB</p>
+                <p>Available: {{ free_disk }} GB</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Network</h2>
+            <p>Sent: {{ sent }} GB</p>
+            <p>Received: {{ recv }} GB</p>
+        </div>
+
+        <div class="card">
+            <h2>System Uptime</h2>
+            <p>{{ days }} Days</p>
+            <p>{{ hours }} Hours</p>
+            <p>{{ minutes }} Minutes</p>
+            <p>{{ seconds }} Seconds</p>
+        </div>
+        <div class="card">
+
+            <h2>Top Processes</h2>
+
+            <table>
+
+                <tr>
+                    <th>Name</th>
+                    <th>CPU%</th>
+                    <th>RAM (MB)</th>
+                </tr>
+
+                {% for process in processes %}
+
+                <tr>
+                    <td>{{ process.name }}</td>
+                    <td>{{ process.cpu }}</td>
+                    <td>{{ process.memory }}</td>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+    </div>
+</body>
+
+</html>
