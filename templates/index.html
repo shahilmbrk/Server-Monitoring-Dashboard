@@ -16,54 +16,55 @@
 
         <div class="card">
             <h2>CPU</h2>
-            <p class="percentage">{{ cpu }}%</p>
+            <p class="percentage" id="cpu-value">{{ cpu }}%</p>
             <div class="progress">
-                <div class="progress-fill" style="width:{{ cpu }}%;background:{{ bar_color }};"> </div>
+                <div class="progress-fill" id="cpu-bar" style="width:{{ cpu }}%;background:{{ cpu_color }};"> </div>
             </div>
             <div class="info">
                 <p>Cores: {{ cpu_count }}</p>
-                <p>Frequency: {{ cpu_freq }} GHz</p>
+                <p id="cpu-freq">Frequency: {{ cpu_freq }} GHz</p>
             </div>
         </div>
 
         <div class="card">
             <h2>RAM</h2>
-            <p class="percentage">{{ memory }}%</p>
+            <p class="percentage" id="memory-value">{{ memory }}%</p>
             <div class="progress">
-                <div class="progress-fill" style="width:{{ memory }}%;background:{{ bar_color }};"> </div>
+                <div class="progress-fill" id="memory-bar" style="width:{{ memory }}%;background:{{ memory_color }};">
+                </div>
             </div>
             <div class="info">
-                <p>Total: {{ total_ram }} GB</p>
-                <p>Used: {{ used_ram }} GB</p>
-                <p>Available: {{ available_ram }} GB</p>
+                <p id="memory-total">Total: {{ total_ram }} GB</p>
+                <p id="memory-used">Used: {{ used_ram }} GB</p>
+                <p id="memory-free">Available: {{ available_ram }} GB</p>
             </div>
         </div>
 
         <div class="card">
             <h2>Disk</h2>
-            <p class="percentage">{{ disk }}%</p>
+            <p class="percentage" id="disk-value">{{ disk }}%</p>
             <div class="progress">
-                <div class="progress-fill" style="width:{{ disk }}%;background:{{ bar_color }};"> </div>
+                <div class="progress-fill" id="disk-bar" style="width:{{ disk }}%;background:{{ disk_color }};"> </div>
             </div>
             <div class="info">
-                <p>Total: {{ total_disk }} GB</p>
-                <p>Used: {{ used_disk }} GB</p>
-                <p>Available: {{ free_disk }} GB</p>
+                <p id="disk-total">Total: {{ total_disk }} GB</p>
+                <p id="disk-used">Used: {{ used_disk }} GB</p>
+                <p id="disk-free">Available: {{ free_disk }} GB</p>
             </div>
         </div>
 
         <div class="card">
             <h2>Network</h2>
-            <p>Sent: {{ sent }} GB</p>
-            <p>Received: {{ recv }} GB</p>
+            <p id="sent-value">Sent: {{ sent }} GB</p>
+            <p id="recv-value">Received: {{ recv }} GB</p>
         </div>
 
         <div class="card">
             <h2>System Uptime</h2>
-            <p>{{ days }} Days</p>
-            <p>{{ hours }} Hours</p>
-            <p>{{ minutes }} Minutes</p>
-            <p>{{ seconds }} Seconds</p>
+            <p id="days">{{ days }} Days</p>
+            <p id="hours">{{ hours }} Hours</p>
+            <p id="minutes">{{ minutes }} Minutes</p>
+            <p id="seconds">{{ seconds }} Seconds</p>
         </div>
         <div class="card">
 
@@ -71,26 +72,34 @@
 
             <table>
 
-                <tr>
-                    <th>Name</th>
-                    <th>CPU%</th>
-                    <th>RAM (MB)</th>
-                </tr>
+                <thead>
 
-                {% for process in processes %}
+                    <tr>
+                        <th>Name</th>
+                        <th>CPU%</th>
+                        <th>RAM (MB)</th>
+                    </tr>
 
-                <tr>
-                    <td>{{ process.name }}</td>
-                    <td>{{ process.cpu }}</td>
-                    <td>{{ process.memory }}</td>
-                </tr>
+                </thead>
 
-                {% endfor %}
+                <tbody id="processes">
 
+                    {% for process in processes %}
+
+                    <tr>
+                        <td>{{ process.name }}</td>
+                        <td>{{ process.cpu }}</td>
+                        <td>{{ process.memory }}</td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
             </table>
 
         </div>
     </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 
 </html>

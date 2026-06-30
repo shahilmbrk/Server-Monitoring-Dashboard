@@ -37,8 +37,8 @@ def disk_usage():
     return disk.percent,total,used,free
 
 def network():
-    size_sent=psutil.net_io_counters().bytes_sent
-    size_recv=psutil.net_io_counters().bytes_recv
+    size_sent=byte_to_gb(psutil.net_io_counters().bytes_sent)
+    size_recv=byte_to_gb(psutil.net_io_counters().bytes_recv)
     
     return size_sent,size_recv
 
@@ -56,7 +56,7 @@ def progress_bar(percentage):
     
 def get_color(value):
 
-    if value > 75:
+    if value > 70:
         return "#ff4444"      #red
 
     elif value > 40:
